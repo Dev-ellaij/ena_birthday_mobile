@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:korean_bubble_tea/pages/home_page.dart';
 
 import 'pages/onboarding_page.dart';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
           overlayColor: Colors.brown.withOpacity(0.2),
         ),
       ),
-      home: const OnboardingPage(), // Initial page
+      home: DevicePage(),
     );
   }
 }

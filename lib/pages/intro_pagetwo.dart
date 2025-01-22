@@ -1,5 +1,5 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IntroPage2 extends StatefulWidget {
@@ -12,6 +12,7 @@ class IntroPage2 extends StatefulWidget {
 class _IntroPage2State extends State<IntroPage2>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
   bool showText = false;
 
   @override
@@ -20,6 +21,15 @@ class _IntroPage2State extends State<IntroPage2>
     _controller = AnimationController(
       duration: const Duration(seconds: 3),
       vsync: this,
+    )..forward().whenComplete(() {
+        setState(() {
+          showText = true;
+        });
+      });
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
     );
   }
 
@@ -29,63 +39,61 @@ class _IntroPage2State extends State<IntroPage2>
     super.dispose();
   }
 
-  void showHappyBirthdayText() {
-    setState(() {
-      showText = true;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF034694),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Lottie Animation
-            Lottie.asset(
-              'assets/Animation-birthday.json',
-              controller: _controller,
-              onLoaded: (composition) {
-                _controller
-                  ..duration = composition.duration
-                  ..forward().whenComplete(showHappyBirthdayText);
-              },
-              height: 200,
-              width: 200,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Fullscreen Background Image with Fade Animation
+          AnimatedBuilder(
+            animation: _fadeAnimation,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _fadeAnimation.value,
+                child: Image.asset(
+                  'assets/buchi3.JPG', // Replace with your image path
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          ),
+          // Overlay content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (showText)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        TypewriterAnimatedText(
+                          'I really want to say I’m sorry for my actions,\n'
+                          'and it was so unreasonable for me to do such.\n'
+                          'I promise it will not happen again 🙏.\n'
+                          'I love you my baby.',
+                          textStyle: GoogleFonts.allura(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.5,
+                          ),
+                          speed: const Duration(milliseconds: 100),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                      isRepeatingAnimation: false,
+                      onFinished: () {
+                        // Navigate to the next page when the animation finishes
+                      },
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            if (showText) ...[
-              Transform.translate(
-                offset: const Offset(0, -20),
-                child: Text(
-                  'Happy Birthday Echezona',
-                  style: GoogleFonts.allura(
-                    fontSize: 60,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20),
-              AnimatedOpacity(
-                opacity: showText ? 1.0 : 0.0,
-                duration: const Duration(seconds: 2),
-                child: const Text(
-                  'Wishing Beautiful Year & Victorious year ahead !',
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

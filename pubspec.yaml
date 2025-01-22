@@ -12,6 +12,7 @@ dependencies:
   lottie: ^3.2.0
   smooth_page_indicator: ^1.2.0+3
   google_fonts: ^6.2.1
+  animated_text_kit: ^4.2.2
 
 dev_dependencies:
   flutter_test:
@@ -21,5 +22,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-  - assets/enaone.jpg
-  - assets/Animation-birthday.json
+   - assets/

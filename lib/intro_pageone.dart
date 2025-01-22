@@ -1,5 +1,7 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:korean_bubble_tea/pages/intro_pagetwo.dart';
 
 class IntroPage1 extends StatefulWidget {
   const IntroPage1({super.key});
@@ -11,14 +13,25 @@ class IntroPage1 extends StatefulWidget {
 class _IntroPage1State extends State<IntroPage1>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  bool showText = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       vsync: this,
-    )..repeat(reverse: true);
+    )..forward().whenComplete(() {
+        setState(() {
+          showText = true;
+        });
+      });
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -27,42 +40,68 @@ class _IntroPage1State extends State<IntroPage1>
     super.dispose();
   }
 
+  void _navigateToNextPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const IntroPage2()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF034694),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: 1.0 + _controller.value * 0.1,
-                  child: Image.asset(
-                    'assets/enaone.jpg',
-                    height: 200,
-                    width: 200,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            Transform.translate(
-              offset: const Offset(0, -20),
-              child: Text(
-                'Happy Birthday,Echezona ✨',
-                style: GoogleFonts.allura(
-                  fontSize: 30,
-                  color: Colors.white,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Fullscreen Background Image with Fade Animation
+          AnimatedBuilder(
+            animation: _fadeAnimation,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _fadeAnimation.value,
+                child: Image.asset(
+                  'assets/buchi3.JPG', // Replace with your image path
+                  fit: BoxFit.cover,
                 ),
-                textAlign: TextAlign.center,
-              ),
+              );
+            },
+          ),
+          // Overlay content
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (showText)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        TypewriterAnimatedText(
+                          'Chief Onyebuchi, Nwoke Oma’m\n'
+                          'The Smart and Mighty, My Big Spender.\n'
+                          'My Sweet Potato',
+                          textStyle: GoogleFonts.allura(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.5,
+                          ),
+                          speed: const Duration(milliseconds: 100),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                      isRepeatingAnimation: false,
+                      onFinished: () {
+                        // Navigate to the next page when the animation finishes
+                        _navigateToNextPage();
+                      },
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
